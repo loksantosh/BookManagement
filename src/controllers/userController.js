@@ -1,130 +1,150 @@
 const userModel = require('../models/userModel')
-const validator = require("email-validator")
+const validator = require('email-validator')
+const jwt = require('jsonwebtoken')
 
 
-const createUser = async function(req,res){
-    try{
-        let data = req.body
 
-        if(Object.keys(data).length == 0){
-            return res.status(400).send({
-             status: false,
-             msg : "Please provide the input"
-            })
-         }
+// 1. API ========================================== CREATE USER ===============================================
 
-        //Validation For Name
-        if((typeof(data.name) != "string") || !data.name.match(/^[a-zA-Z ][a-zA-Z ]+[a-zA-Z ]+$/)) {
-            return res.status(400).send({
-                status: false,
-                msg: "Intern Name is Missing or should contain only alphabets"
-            })
+const createUser = async function (req, res) {
+    try {
+        let { name, title, email, phone, password, address } = req.body
+
+        if (Object.keys(req.body).length == 0) {
+            return res.status(400).send({ status: false, msg: "Please enter request data to be created" })
         }
-        
-        //Validation for Title
-        if (typeof (data.title) != "string") {
-            return res.status(400).send({
-                status: false,
-                msg: "Title is Missing or does not have a valid input"
-            })
+        //title
+        if (!title) {
+            return res.status(400).send({ status: false, msg: "Please enter title" })
         }
-        //To handle enum condition
-        else {
-            if (data.title != "Mr" && data.title != "Mrs" && data.title != "Miss") {
-                return res.status(400).send({
-                    status: false,
-                    msg: "Title can only be Mr Mrs or Miss"
-                })
-            }
-        }
-        //Validation for email
-        if((typeof(data.email) != "string") || data.email.trim().length==0) {
-            return res.status(400).send({
-                status: false,
-                msg: "Email is Missing"
-            })
-        }
-        if (!validator.validate(data.email)) {
-            return res.status(400).send({
-                status: false,
-                msg: "Email-Id is invalid"
-            })
-        }
-        //Checks For Unique Email Id
-        let checkEmail = await userModel.findOne({ email: data.email , isDeleted : false})
-        if (checkEmail) {
-            return res.status(400).send({
-                status: false,
-                msg: "Email Id already Registred"
-            })
-        }
-           //Validation For Password
-           if ((typeof (data.password) != "string")|| !data.password.
-           match(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/)) {
-      return res.status(400).send({
-          status: false,
-          msg: "password must be 8-15 charecter long with a number special charecter and should have both upper and lowercase alphabet"
-      })
+        if (!(title == "Mrs" || title == "Mr" || title == "Miss")) {
+            return res.status(401).send({ error: "title has to be Mr or Mrs or Miss " })
         }
 
-        //Validation for phone
-        if((typeof(data.phone) != "string")){
-            return  res.status(400).send({
-                  status : false,
-                  msg : "Phone Number is required"  
-              })
-          }
-          if (!data.phone.match(/^[6-9]\d{9}$/)){
-            return  res.status(400).send({
-                  status : false,
-                  msg : "Not a valid Phone Number"  
-              })
-          }
-          let number =  await userModel.findOne({phone : data.phone})
-          if(number){
-              return res.status(400).send({
-                  status: false,
-                  msg: "Phone Number already Registred"
-              }) 
-          }
-
-        if(data.address) { 
-            if(typeof(data.address.city) != 'string'){
-            return res.status(400).send({
-                status: false,
-                msg: "Please enter a valid city name"
-            }) 
-          }
-          if(typeof(data.address.street) != 'string'){
-            return res.status(400).send({
-                status: false,
-                msg: "Please enter a valid street name"
-            }) 
-          }
-          if(typeof(data.address.pincode) != 'string' || !data.address.pincode.match(/^\d{6}$/)){
-            return res.status(400).send({
-                status: false,
-                msg: "Please enter a valid pincode"
-            })
-          }
+        //name
+        if (!name) {
+            return res.status(400).send({ status: false, msg: "Please enter name" })
         }
 
-        //Creating Autor Only if above validation are passed    
-        let savedData = await userModel.create(data)
-        res.status(201).send({
-            status: true,
-            data: savedData
-        })
+
+        if (!name) {
+            return res.status(400).send({ status: false, msg: "Please enter name" })
+        }
+        if (typeof name != "string" || name.trim().length==0) return res.status(400).send({ status: false, msg: " Please enter  name as a String" });
+
+        if (!(/^\w[a-zA-Z.\s_]*$/.test(name))) return res.status(400).send({ status: false, msg: "The  name may contain only letters" });
+
+        //email
+        if (!email) {
+            return res.status(400).send({ status: false, msg: "email is missing" })
+        }
+
+        let checkEmail = validator.validate(email)
+        if (!checkEmail) {
+            return res.status(400).send({ status: false, msg: "please enter email in valid format " })
+        }
+
+        let uniqueEmail = await userModel.findOne({ email })
+        if (uniqueEmail) {
+            return res.status(400).send({ status: false, msg: "This email already exists" })
+        }
+
+        //phone
+        if (!phone) {
+            return res.status(400).send({ status: false, msg: "phone is missing" })
+        }
+
+        if (typeof phone !== "string") return res.status(400).send({ status: false, msg: " Please enter  phone as a String" });
+
+        if (!/^(\+\d{1,3}[- ]?)?\d{10}$/.test(phone)) return res.status(400).send({ status: false, msg: "Please enter a valid Indian phone number" });
+
+        let uniquephone = await userModel.findOne({ phone: phone })
+        if (uniquephone) {
+            return res.status(400).send({ status: false, msg: "This phone number already exists" })
+        }
+
+        //password
+        if (!password) {
+            return res.status(400).send({ status: false, msg: "password is missing" })
+        }
+
+        if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/.test(password))
+            return res.status(400).send({ status: false, msg: "password must be 8-15 charecter long with a number special charecter and should have both upper and lowercase alphabet" });
+
+        //address
+
+        if (!/^\w[a-zA-Z.,\s]*$/.test(address.city)) return res.status(400).send({ status: false, msg: "The  city may contain only letters" });
+
+
+        if (!/^\d{6}$/.test(address.pincode)) return res.status(400).send({ status: false, msg: "Please enter valid Pincode" });
+
+        let saveData = await userModel.create(req.body)
+        return res.status(201).send({ status: true, msg: "Your user has been created successfully", data: saveData, })
+
+    } catch (err) {
+        return res.status(500).send({ status: false, msg: err.message })
     }
-    catch(err){
-        console.log("Error is From Creating User :", err.message)
-        res.status(500).send({
-            status : false,
-            msg : err.message
-        })
+
+}
+
+// 2 API =================================================== LOGIN USER ======================================== 
+
+const loginUser = async function (req, res) {
+    try {
+
+        let { email, password } = req.body
+
+        if (Object.keys(req.body).length == 0) {
+            return res.status(400).send({ status: false, msg: "please enter data in request body" })
+        }
+
+        if (!email) {
+            return res.status(400).send({ status: false, msg: "please enter email" })
+        }
+
+        if (!password) {
+            return res.status(400).send({ status: false, msg: "please enter password " })
+        }
+
+        let user = await userModel.findOne({ email: email, password: password });
+        if (!user) {
+            return res.status(404).send({ status: false, msg: "no data found " })
+        }
+
+        let token = jwt.sign(
+            {
+                userId: user._id.toString(),
+                batch: "radon",
+                organisation: "functionUp"
+            },
+            "Group24-radon",
+            { expiresIn: "3600s" }
+        )
+
+        res.setHeader("x-api-key", token)
+
+        return res.status(200).send({ status: true, msg: "user are login successfully", data: token })
+
+    } catch (err) {
+        return res.status(500).send({ status: false, msg: err.message })
     }
+
 }
 
 
+module.exports ={ createUser ,loginUser}
 
-module.exports.createUser = createUser
+
+
+
+
+
+
+
+
+
+
+
+
+
+
