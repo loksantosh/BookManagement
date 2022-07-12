@@ -8,9 +8,10 @@ const jwt = require('jsonwebtoken')
 
 const createUser = async function (req, res) {
     try {
-        let { name, title, email, phone, password, address } = req.body
+        let data = req.body
+        let { name, title, email, phone, password, address } = data
 
-        if (Object.keys(req.body).length == 0) {
+        if (Object.keys(data).length == 0) {
             return res.status(400).send({ status: false, msg: "Please enter request data to be created" })
         }
         //title
@@ -22,9 +23,6 @@ const createUser = async function (req, res) {
         }
 
         //name
-        if (!name) {
-            return res.status(400).send({ status: false, msg: "Please enter name" })
-        }
 
 
         if (!name) {
@@ -33,6 +31,20 @@ const createUser = async function (req, res) {
         if (typeof name != "string" || name.trim().length==0) return res.status(400).send({ status: false, msg: " Please enter  name as a String" });
 
         if (!(/^\w[a-zA-Z.\s_]*$/.test(name))) return res.status(400).send({ status: false, msg: "The  name may contain only letters" });
+
+        //phone
+        if (!phone) {
+            return res.status(400).send({ status: false, msg: "phone is missing" })
+        }
+
+        if (typeof phone !== "string") return res.status(400).send({ status: false, msg: " Please enter  phone as a String" });
+
+        if (!/^(\+\d{1,3}[- ]?)?\d{10}$/.test(phone)) return res.status(400).send({ status: false, msg: "Please enter a valid Indian phone number" });
+
+        let uniquephone = await userModel.findOne({ phone: phone })
+        if (uniquephone) {
+            return res.status(400).send({ status: false, msg: "This phone number already exists" })
+        }
 
         //email
         if (!email) {
@@ -49,19 +61,7 @@ const createUser = async function (req, res) {
             return res.status(400).send({ status: false, msg: "This email already exists" })
         }
 
-        //phone
-        if (!phone) {
-            return res.status(400).send({ status: false, msg: "phone is missing" })
-        }
-
-        if (typeof phone !== "string") return res.status(400).send({ status: false, msg: " Please enter  phone as a String" });
-
-        if (!/^(\+\d{1,3}[- ]?)?\d{10}$/.test(phone)) return res.status(400).send({ status: false, msg: "Please enter a valid Indian phone number" });
-
-        let uniquephone = await userModel.findOne({ phone: phone })
-        if (uniquephone) {
-            return res.status(400).send({ status: false, msg: "This phone number already exists" })
-        }
+        
 
         //password
         if (!password) {
@@ -78,7 +78,7 @@ const createUser = async function (req, res) {
 
         if (!/^\d{6}$/.test(address.pincode)) return res.status(400).send({ status: false, msg: "Please enter valid Pincode" });
 
-        let saveData = await userModel.create(req.body)
+        let saveData = await userModel.create(data)
         return res.status(201).send({ status: true, msg: "Your user has been created successfully", data: saveData, })
 
     } catch (err) {

@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const bookModel = require('../models/bookModel')
 
+//========================================= AUTHENTICATION ==============================================================
 
 const authentication = async function (req, res, next) {
     try {
@@ -13,7 +14,7 @@ const authentication = async function (req, res, next) {
             if (error) {
                 return undefined
             } else {
-                if(token.exp < (new Date().getTime() + 1) / 1000) return res.status(400).send({msd:"token expired"})
+                if(token.exp < (new Date().getTime() + 1) / 1000) return res.status(400).send({msg:"token expired"})
 
                 return token
             }
@@ -31,6 +32,7 @@ const authentication = async function (req, res, next) {
     }
 }
 
+//========================================= AUTHORIZATION ==============================================================
 
 
 const authorization = async function (req, res, next) {
