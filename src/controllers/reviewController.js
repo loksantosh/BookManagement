@@ -56,15 +56,14 @@ const updatereview = async (req, res) => {
 
         const bookId = req.params.bookId
         const reviewId = req.params.reviewId
-        console.log(reviewId)
+
         const isValid = mongoose.Types.ObjectId.isValid(bookId)
         if (!isValid) return res.status(400).send({ status: false, msg: "enter valid bookID" })
 
         const isValid1 = mongoose.Types.ObjectId.isValid( reviewId)
         if (!isValid1) return res.status(400).send({ status: false, msg: "enter valid rejectID" })
 
-
-        if (!bookId || !reviewId) return res.status(400).send({ status: false, messege: "bookId is required or bookId is required" })
+        if (!bookId || !reviewId) return res.status(400).send({ status: false, messege: "bookId is required or reviewId is required" })
 
 
         const alert = await bookModel.findById(bookId).select({ createdAt: 0, updatedAt: 0,deletedAt:0 })
@@ -74,20 +73,17 @@ const updatereview = async (req, res) => {
         if (alert.isDeleted) return res.status(409).send({ status: false, messege: "this book is already deleted" })
 
 
-
         const alert2 = await reviewModel.findById(reviewId)
         if (!alert2) return res.status(404).send({ status: false, messege: "no data found " })
 
         if (alert2.isDeleted) return res.status(409).send({ status: false, messege: "this review is already deleted" })
 
-        if (alert2.bookId != bookId) return res.status(400).send({ status: false, messege: "book and review doesn't match " })
+        if (alert2.bookId != reviewId) return res.status(400).send({ status: false, messege: "book and review doesn't match " })
 
 
         const data = req.body
 
         const { rating, review, reviewedBy } = data
-
-
 
 
         const updatereview = await reviewModel.findByIdAndUpdate((reviewId), { $set: { rating: rating, review: review, reviewedBy:reviewedBy, reviewedAt: Date.now() } }, { new: true })
@@ -116,7 +112,7 @@ const deletereview = async (req, res) => {
         const isValid1 = mongoose.Types.ObjectId.isValid( reviewId)
         if (!isValid1) return res.status(400).send({ status: false, msg: "enter valid reviewID" })
 
-        if (!bookId || !reviewId) return res.status(400).send({ status: false, messege: "bookId is required or bookId is required" })
+        if (!bookId || !reviewId) return res.status(400).send({ status: false, messege: "bookId is required or review is required" })
 
 
         const alert = await bookModel.findById({ _id: bookId }).select({ createdAt: 0, updatedAt: 0 })
@@ -131,7 +127,7 @@ const deletereview = async (req, res) => {
 
         if (alert2.isDeleted) return res.status(409).send({ status: false, messege: "this review is already deleted" })
 
-        if (alert2.bookId != bookId) return res.status(400).send({ status: false, messege: "book and review doesn't match " })
+        if (alert2.bookId != reviewId) return res.status(400).send({ status: false, messege: "book and review doesn't match " })
 
         const reviewinc = await bookModel.findByIdAndUpdate((bookId), { $inc: { reviews: -1 } })
 

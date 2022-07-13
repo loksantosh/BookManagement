@@ -13,24 +13,24 @@ router.post('/login',userController.loginUser)
 
 // 2. ============= BOOKS API'S ==================================================
 
-router.post('/books',bookController.createBooks)
+router.post('/books',mw.authentication,bookController.createBooks)
 
-router.get('/books',bookController.getBooks)
+router.get('/books',mw.authentication,bookController.getBooks)
 
-router.get('/books/:bookId',bookController.getBooksById)
+router.get('/books/:bookId',mw.authentication,bookController.getBooksById)
 
-router.put('/books/:bookId',bookController.updateBook)
+router.put('/books/:bookId',mw.authentication,mw.authorization,bookController.updateBook)
 
-router.delete('/books/:bookId',bookController.deleteBook)
+router.delete('/books/:bookId',mw.authentication,mw.authorization,bookController.deleteBook)
 
 
 // 3. ================ REVIEW API'S ===============================================
 
 router.post('/books/:bookId',reviewController.createReview)
 
-router.put('/books/:bookId/review/:reviewId',reviewController.updatereview)
+router.put('/books/:bookId/review/:reviewId',mw.authentication,mw.authorization,reviewController.updatereview)
 
-router.delete('/books/:bookId/review/:reviewId',reviewController.deletereview)
+router.delete('/books/:bookId/review/:reviewId',mw.authentication,mw.authorization,reviewController.deletereview)
 
 
 

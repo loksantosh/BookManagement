@@ -144,7 +144,7 @@ const getBooksById = async function (req, res) {
             }
         }
 
-        let bookDetail = await bookModel.findOne({ _id: bookId, isDeleted: false });
+        let bookDetail = await bookModel.findById({ _id: bookId, isDeleted: false });
 
         if (!bookDetail)
             return res.status(404).send({ status: false, messege: "Book not found!" });
