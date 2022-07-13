@@ -17,7 +17,7 @@ const createReview = async function (req, res) {
         if (alert.isDeleted) return res.status(409).send({ status: false, msg: " Book is already deleted" })
       
         let data=req.body
-        const { rating, review, reviewedBy, reviewedAt } =data
+        const { rating, review, reviewedBy } =data
         if(!rating) return res.status(400).send({status:false ,messege:"rating is required"})
 
         if (typeof (data.rating) != 'number' || (data.rating > 5 || data.rating < 1)) {
@@ -31,10 +31,9 @@ const createReview = async function (req, res) {
         if(!review) return res.status(400).send({status:false ,messege:"review is required"})
         if(review.trim().length==0) return res.status(400).send({status:false ,messege:"review is required"})
 
-        if(!reviewedAt) return res.status(400).send({status:false ,messege:"reviewAt is required"})
 
-
-
+        let date = Date.now()
+      let reviewedAt = date
         const newdata = { bookId, rating, review, reviewedBy, reviewedAt }
         const reviews = await reviewModel.create(newdata)
 
@@ -50,7 +49,7 @@ const createReview = async function (req, res) {
 
 // 9. API ========================================= UPDATE REVIEW ===========================================================
 
-const updatereview = async (req, res) => {
+const updatereview = async function (req, res)  {
 
     try {
 
@@ -60,10 +59,12 @@ const updatereview = async (req, res) => {
         const isValid = mongoose.Types.ObjectId.isValid(bookId)
         if (!isValid) return res.status(400).send({ status: false, msg: "enter valid bookID" })
 
+        if (!bookId ) return res.status(400).send({ status: false, messege: "bookId is required  " })
+
         const isValid1 = mongoose.Types.ObjectId.isValid( reviewId)
         if (!isValid1) return res.status(400).send({ status: false, msg: "enter valid rejectID" })
 
-        if (!bookId || !reviewId) return res.status(400).send({ status: false, messege: "bookId is required or reviewId is required" })
+        if (!reviewId) return res.status(400).send({ status: false, messege: " reviewId is required" })
 
 
         const alert = await bookModel.findById(bookId).select({ createdAt: 0, updatedAt: 0,deletedAt:0 })
@@ -108,11 +109,13 @@ const deletereview = async (req, res) => {
 
         const isValid = mongoose.Types.ObjectId.isValid(bookId)
         if (!isValid) return res.status(400).send({ status: false, msg: "enter valid bookID" })
+        if (!bookId ) return res.status(400).send({ status: false, messege: "bookId is required  " })
+
 
         const isValid1 = mongoose.Types.ObjectId.isValid( reviewId)
         if (!isValid1) return res.status(400).send({ status: false, msg: "enter valid reviewID" })
+        if (!reviewId) return res.status(400).send({ status: false, messege: " reviewId is required" })
 
-        if (!bookId || !reviewId) return res.status(400).send({ status: false, messege: "bookId is required or review is required" })
 
 
         const alert = await bookModel.findById({ _id: bookId }).select({ createdAt: 0, updatedAt: 0 })

@@ -19,7 +19,7 @@ const createUser = async function (req, res) {
             return res.status(400).send({ status: false, msg: "Please enter title" })
         }
         if (!(title == "Mrs" || title == "Mr" || title == "Miss")) {
-            return res.status(401).send({ error: "title has to be Mr or Mrs or Miss " })
+            return res.status(400).send({ error: "title has to be Mr or Mrs or Miss " })
         }
 
         //name

@@ -7,12 +7,12 @@ const bookSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        trim:true
+        trim: true
     },
     excerpt: {
         type: String,
         required: true,
-        trim:true
+        trim: true
 
     },
     userId: {
@@ -28,15 +28,15 @@ const bookSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        trim:true
+        trim: true
 
     },
     subcategory: {
         type: [String],
         required: true,
-        trim:true
+        trim: true
 
-},
+    },
     reviews: {
         type: Number,
         default: 0,
@@ -58,4 +58,4 @@ const bookSchema = new mongoose.Schema({
 
 }, { timestamp: true })
 
-module.exports=mongoose.model("Book",bookSchema)
+module.exports = mongoose.model("Book", bookSchema)

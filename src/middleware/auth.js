@@ -14,7 +14,7 @@ const authentication = async function (req, res, next) {
             if (error) {
                 return undefined
             } else {
-                if(token.exp < (new Date().getTime() + 1) / 1000) return res.status(400).send({msg:"token expired"})
+                if (Date.now() >= token.exp * 1000) return res.status(400).send({ msg: "token expired" })
 
                 return token
             }
@@ -51,11 +51,11 @@ const authorization = async function (req, res, next) {
             return res.status(404).send({ status: false, msg: "no such book exists" })
         }
 
-        if (checkBook.userId !=validUserId) {
+        if (checkBook.userId != validUserId) {
             return res.status(403).send({ status: false, msg: "User is not authorized" })
         }
 
-        
+
 
         next()
 
