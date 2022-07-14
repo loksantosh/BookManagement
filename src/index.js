@@ -1,14 +1,16 @@
 const express = require('express');
-const multer =  require('multer')
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const route = require('./routes/route.js');
+const multer =  require('multer')
 const app = express();
-const { AppConfig } = require('aws-sdk')
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(multer().any())
+const { AppConfig } = require('aws-sdk')
 
 
 mongoose.connect("mongodb+srv://dhirajpatil:XuEAzywgRheQB7B1@cluster0.0v32f.mongodb.net/group24Database?retryWrites=true&w=majority"

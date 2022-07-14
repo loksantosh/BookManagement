@@ -1,3 +1,5 @@
+//====================================================== AWS S3 (FUNCTION) ==============================================
+
 const aws = require('aws-sdk')
 aws.config.update({
     accessKeyId: "AKIAY3L35MCRVFM24Q7U",
