@@ -86,6 +86,7 @@ const createBooks = async function (req, res) {
         if (!/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/.test(releasedAt)) return res.status(400).send({ status: false, messege: "releasedAt should be valid" })
 
         if (typeof subcategory == 'array') subcategory = subcategory.join('')
+         req.body.bookCover = req.bookCover
 
         let saveData = await bookModel.create(req.body)
         return res.status(201).send({ status: true, messege: "Your book has been created successfully", data: saveData, })

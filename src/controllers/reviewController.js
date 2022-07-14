@@ -8,6 +8,10 @@ const createReview = async function (req, res) {
     try {
 
         let bookId = req.params.bookId
+
+        const isValid = mongoose.Types.ObjectId.isValid(bookId)
+        if (!isValid) return res.status(400).send({ status: false, msg: "enter valid bookID" })
+
         const reviewinc = await bookModel.findByIdAndUpdate((bookId), { $inc: { reviews: 1 } })
         const alert = await bookModel.findById(bookId).select({ createdAt: 0, updatedAt: 0 ,deletedAt:0})
         
