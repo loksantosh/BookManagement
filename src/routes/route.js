@@ -15,7 +15,7 @@ router.post('/login',userController.loginUser)
 
 // 2. ============= BOOKS API'S ==================================================
 
-router.post('/books',awsURL.aws1,bookController.createBooks)
+router.post('/books',mw.authentication,awsURL.aws1,bookController.createBooks)
 
 router.get('/books',mw.authentication,bookController.getBooks)
 
