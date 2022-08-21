@@ -1,38 +1,36 @@
 const express = require('express');
-const aws = require('aws-sdk')
 const router = express.Router();
-const userController = require('../controllers/userController')
-const bookController = require('../controllers/bookController')
-const reviewController = require('../controllers/reviewController')
-const awsURL = require('../aws/aws')
-const mw = require('../middleware/auth')
+const {createUser,loginUser} = require('../controllers/userController')
+const {createBooks,getBooks,getBooksById,updateBook,deleteBook} = require('../controllers/bookController')
+const {createReview,updatereview,deletereview} = require('../controllers/reviewController')
+const {authentication} = require('../middleware/auth')
 
 // 1. ============= USER API'S ===================================================
 
-router.post('/register', userController.createUser)
+router.post('/register', createUser)
 
-router.post('/login',userController.loginUser)
+router.post('/login',loginUser)
 
 // 2. ============= BOOKS API'S ==================================================
 
-router.post('/books',mw.authentication,awsURL.aws1,bookController.createBooks)
+router.post('/books',authentication,createBooks)
 
-router.get('/books',mw.authentication,bookController.getBooks)
+router.get('/books',authentication,getBooks)
 
-router.get('/books/:bookId',mw.authentication,bookController.getBooksById)
+router.get('/books/:bookId',authentication,getBooksById)
 
-router.put('/books/:bookId',mw.authentication,mw.authorization,bookController.updateBook)
+router.put('/books/:bookId',authentication,updateBook)
 
-router.delete('/books/:bookId',mw.authentication,mw.authorization,bookController.deleteBook)
+router.delete('/books/:bookId',authentication,deleteBook)
 
 
 // 3. ================ REVIEW API'S ===============================================
 
-router.post('/books/:bookId',reviewController.createReview)
+router.post('/books/:bookId',createReview)
 
-router.put('/books/:bookId/review/:reviewId',mw.authentication,mw.authorization,reviewController.updatereview)
+router.put('/books/:bookId/review/:reviewId',authentication,updatereview)
 
-router.delete('/books/:bookId/review/:reviewId',mw.authentication,mw.authorization,reviewController.deletereview)
+router.delete('/books/:bookId/review/:reviewId',authentication,deletereview)
 
 
 
@@ -43,3 +41,5 @@ router.all("*" , (req,res)=>{
 
 
 module.exports = router;
+
+
